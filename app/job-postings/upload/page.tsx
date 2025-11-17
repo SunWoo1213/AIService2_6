@@ -1,5 +1,5 @@
 /**
- * 채용 공고 업로드 페이지
+ * 채용 공고 업로드 페이지 (인증 필요)
  */
 'use client';
 
@@ -7,8 +7,9 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import JobPostingAnalysis from '@/components/JobPostingAnalysis';
+import AuthGuard from '@/components/AuthGuard';
 
-export default function UploadJobPostingPage() {
+function UploadJobPostingPageContent() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -178,6 +179,14 @@ export default function UploadJobPostingPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function UploadJobPostingPage() {
+  return (
+    <AuthGuard>
+      <UploadJobPostingPageContent />
+    </AuthGuard>
   );
 }
 

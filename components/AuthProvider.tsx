@@ -23,7 +23,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   ];
 
   // 현재 경로가 공개 라우트인지 확인
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;
 
   // 공개 라우트라면 AuthGuard 없이 렌더링
   if (isPublicRoute) {

@@ -12,7 +12,6 @@ interface InterviewTurnCardProps {
   userAnswerText: string;
   userAnswerAudioUrl: string;
   turnFeedbackText?: string;
-  score?: number;
 }
 
 export default function InterviewTurnCard({
@@ -21,7 +20,6 @@ export default function InterviewTurnCard({
   userAnswerText,
   userAnswerAudioUrl,
   turnFeedbackText,
-  score,
 }: InterviewTurnCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -36,11 +34,6 @@ export default function InterviewTurnCard({
           <span className="text-left text-gray-300 line-clamp-1">{questionText}</span>
         </div>
         <div className="flex items-center gap-3">
-          {score !== undefined && (
-            <span className="px-3 py-1 bg-primary-500/20 text-primary-400 rounded-full text-sm font-semibold">
-              {score}점
-            </span>
-          )}
           <svg
             className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
             fill="none"

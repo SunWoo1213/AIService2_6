@@ -70,7 +70,6 @@ export interface CoverLetterFeedback {
     example: string;
   }>;
   interview_questions: string[];
-  overall_score: number;
   overall_feedback: string;
 }
 
@@ -102,7 +101,6 @@ ${coverLetterText}
 
 위 정보를 바탕으로 다음 형식의 JSON으로 피드백을 제공해줘:
 {
-  "overall_score": 100점 만점 점수,
   "overall_feedback": "종합 피드백 (3-5문장)",
   "strengths": ["잘 쓴 부분 3-5개"],
   "improvements": [
@@ -209,16 +207,11 @@ ${context.conversationHistory.map((turn, idx) =>
 
 export interface FinalInterviewFeedback {
   overall_feedback: string;
-  attitude_score: number;
-  content_score: number;
-  consistency_score: number;
-  job_fit_score: number;
   per_turn_feedback: Array<{
     turn_number: number;
     question: string;
     answer: string;
     feedback: string;
-    score: number;
   }>;
 }
 
@@ -244,18 +237,13 @@ ${JSON.stringify(context.jobPosting.analysis_json, null, 2)}
 
 위 면접 내용을 바탕으로 다음 형식의 JSON 피드백을 제공해줘:
 {
-  "overall_feedback": "종합 피드백 (5-7문장)",
-  "attitude_score": 면접 태도 점수 (100점 만점),
-  "content_score": 답변 내용 점수 (100점 만점),
-  "consistency_score": 일관성 점수 (100점 만점),
-  "job_fit_score": 직무 적합성 점수 (100점 만점),
+  "overall_feedback": "종합 피드백 (5-7문장). 면접 태도, 답변 내용, 일관성, 직무 적합성에 대한 상세한 설명을 포함해줘.",
   "per_turn_feedback": [
     {
       "turn_number": 1,
       "question": "질문",
       "answer": "답변",
-      "feedback": "이 답변에 대한 구체적 피드백",
-      "score": 100점 만점 점수
+      "feedback": "이 답변에 대한 구체적이고 상세한 피드백. 좋았던 점과 개선할 점을 모두 포함해줘."
     }
   ]
 }`;

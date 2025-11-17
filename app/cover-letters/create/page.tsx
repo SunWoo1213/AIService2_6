@@ -126,14 +126,6 @@ export default function CreateCoverLetterPage() {
           <div className="space-y-8">
             <div className="p-6 bg-gray-900 rounded-lg border border-gray-800">
               <h2 className="text-2xl font-bold mb-4">AI 피드백</h2>
-              
-              {/* 종합 점수 */}
-              <div className="mb-6 p-4 bg-gray-800 rounded-lg text-center">
-                <div className="text-5xl font-bold text-primary-500 mb-2">
-                  {feedback.overall_score || 0}점
-                </div>
-                <p className="text-gray-400">종합 점수 (100점 만점)</p>
-              </div>
 
               {/* 종합 피드백 */}
               <div className="mb-6">

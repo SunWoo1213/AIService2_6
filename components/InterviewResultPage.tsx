@@ -13,16 +13,11 @@ interface InterviewResultPageProps {
     completedAt: string;
     finalFeedback: {
       overall_feedback: string;
-      attitude_score: number;
-      content_score: number;
-      consistency_score: number;
-      job_fit_score: number;
       per_turn_feedback: Array<{
         turn_number: number;
         question: string;
         answer: string;
         feedback: string;
-        score: number;
       }>;
     };
   };
@@ -48,26 +43,6 @@ export default function InterviewResultPage({ session, turns }: InterviewResultP
             <div className="sticky top-8 space-y-6">
               <div className="p-6 bg-gray-900 rounded-lg border border-gray-800">
                 <h2 className="text-xl font-bold mb-4">종합 평가</h2>
-
-                {/* 점수 표시 */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="text-center p-4 bg-gray-800 rounded-lg">
-                    <div className="text-3xl font-bold text-primary-500">{finalFeedback.attitude_score}</div>
-                    <div className="text-sm text-gray-400 mt-1">면접 태도</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-800 rounded-lg">
-                    <div className="text-3xl font-bold text-primary-500">{finalFeedback.content_score}</div>
-                    <div className="text-sm text-gray-400 mt-1">답변 내용</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-800 rounded-lg">
-                    <div className="text-3xl font-bold text-primary-500">{finalFeedback.consistency_score}</div>
-                    <div className="text-sm text-gray-400 mt-1">일관성</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-800 rounded-lg">
-                    <div className="text-3xl font-bold text-primary-500">{finalFeedback.job_fit_score}</div>
-                    <div className="text-sm text-gray-400 mt-1">직무 적합성</div>
-                  </div>
-                </div>
 
                 {/* 종합 피드백 */}
                 <div>
@@ -112,7 +87,6 @@ export default function InterviewResultPage({ session, turns }: InterviewResultP
                   userAnswerText={turn.user_answer_text}
                   userAnswerAudioUrl={turn.user_answer_audio_s3_url}
                   turnFeedbackText={turnFeedback?.feedback}
-                  score={turnFeedback?.score}
                 />
               );
             })}

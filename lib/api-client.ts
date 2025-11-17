@@ -16,16 +16,15 @@ export class ApiClient {
   ): Promise<T> {
     const token = this.getToken();
 
-    const headers: HeadersInit = {
-      ...options.headers,
-    };
+    // Headers 클래스 사용으로 리팩터링
+    const headers = new Headers(options.headers);
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers.set('Authorization', `Bearer ${token}`);
     }
 
     if (!(options.body instanceof FormData)) {
-      headers['Content-Type'] = 'application/json';
+      headers.set('Content-Type', 'application/json');
     }
 
     const response = await fetch(`${API_URL}${endpoint}`, {

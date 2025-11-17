@@ -11,7 +11,7 @@ import JobPostingAnalysis from '@/components/JobPostingAnalysis';
 export default function CreateCoverLetterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const jobPostingId = searchParams.get('jobPostingId');
+  const jobPostingId = searchParams?.get('jobPostingId');
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);

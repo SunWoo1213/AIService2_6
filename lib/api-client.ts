@@ -2,6 +2,8 @@
  * Frontend API 클라이언트 유틸리티
  */
 
+// 로컬 개발 시 빈 문자열 (상대 경로 사용)
+// 프로덕션 시 전체 도메인 사용
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export class ApiClient {

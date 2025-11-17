@@ -12,7 +12,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   }
 
   const userId = req.user!.userId;
-  const { id } = req.query;
+  const id = req.query?.id as string;
 
   // 세션 조회
   const sessionResult = await query(

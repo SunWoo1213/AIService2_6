@@ -3,11 +3,24 @@
  * 사용법: node scripts/migrate.js
  */
 
+// .env 파일 로드
+require('dotenv').config();
+
 const fs = require('fs');
 const path = require('path');
 const { Client } = require('pg');
 
 async function migrate() {
+  // 환경 변수 확인
+  if (!process.env.DATABASE_URL) {
+    console.error('❌ DATABASE_URL 환경 변수가 설정되지 않았습니다.');
+    console.error('💡 .env 파일을 확인해주세요.');
+    process.exit(1);
+  }
+
+  console.log('🔗 데이터베이스 연결 시도 중...');
+  console.log('📍 HOST:', process.env.DATABASE_URL.split('@')[1]?.split('/')[0] || '(확인 불가)');
+
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
   });

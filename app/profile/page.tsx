@@ -3,7 +3,7 @@
  */
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 
@@ -17,32 +17,39 @@ export default function ProfilePage() {
   // 프로필 데이터
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
+  const [currentJob, setCurrentJob] = useState('');
+  const [careerSummary, setCareerSummary] = useState('');
+  const [certifications, setCertifications] = useState('');
   const [career, setCareer] = useState<Array<{ company: string; position: string; period: string }>>([]);
   const [education, setEducation] = useState<Array<{ school: string; major: string; degree: string; graduation_year: number }>>([]);
   const [certificates, setCertificates] = useState<Array<{ name: string; issued_date: string }>>([]);
   const [skills, setSkills] = useState<string[]>([]);
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       const result = await apiClient.getProfile();
       const profile = result.profile;
 
-      setAge(profile.age || '');
+      setAge(profile.age ? String(profile.age) : '');
       setGender(profile.gender || '');
+      setCurrentJob(profile.current_job || '');
+      setCareerSummary(profile.career_summary || '');
+      setCertifications(profile.certifications || '');
       setCareer(profile.career_json || []);
       setEducation(profile.education_json || []);
       setCertificates(profile.certificates_json || []);
       setSkills(profile.skills_json || []);
     } catch (err: any) {
       console.error('프로필 로드 실패:', err);
+      setError(err.message || '프로필 로드에 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -53,13 +60,19 @@ export default function ProfilePage() {
       await apiClient.updateProfile({
         age: age ? parseInt(age) : null,
         gender: gender || null,
+        current_job: currentJob || null,
+        career_summary: careerSummary || null,
+        certifications: certifications || null,
         career_json: career,
         education_json: education,
         certificates_json: certificates,
         skills_json: skills,
       });
 
-      setSuccess('프로필이 저장되었습니다!');
+      setSuccess('프로필이 성공적으로 저장되었습니다!');
+      
+      // 3초 후 성공 메시지 자동 제거
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
       setError(err.message || '저장에 실패했습니다.');
       console.error('프로필 저장 실패:', err);
@@ -116,27 +129,65 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-bold mb-4">기본 정보</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">나이</label>
+                <label className="block text-sm font-medium mb-2 text-gray-300">나이</label>
                 <input
                   type="number"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-500"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-500 text-white"
                   placeholder="예: 28"
+                  min="0"
+                  max="150"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">성별</label>
+                <label className="block text-sm font-medium mb-2 text-gray-300">성별</label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-500"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-500 text-white"
                 >
-                  <option value="">선택</option>
-                  <option value="남성">남성</option>
-                  <option value="여성">여성</option>
-                  <option value="기타">기타</option>
+                  <option value="">선택하세요</option>
+                  <option value="male">남자</option>
+                  <option value="female">여자</option>
                 </select>
+              </div>
+            </div>
+          </div>
+
+          {/* 직업 및 경력 정보 */}
+          <div className="p-6 bg-gray-900 rounded-lg border border-gray-800">
+            <h2 className="text-2xl font-bold mb-4">직업 및 경력</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-300">현재 직업</label>
+                <input
+                  type="text"
+                  value={currentJob}
+                  onChange={(e) => setCurrentJob(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-500 text-white placeholder-gray-500"
+                  placeholder="예: 소프트웨어 엔지니어"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-300">경력 요약</label>
+                <textarea
+                  value={careerSummary}
+                  onChange={(e) => setCareerSummary(e.target.value)}
+                  rows={5}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-500 text-white placeholder-gray-500 resize-none"
+                  placeholder="요약된 경력을 입력하세요...&#10;&#10;예:&#10;- ABC 회사 개발팀 (2020-2023)&#10;- XYZ 스타트업 백엔드 개발자 (2018-2020)"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-300">소유한 자격증</label>
+                <textarea
+                  value={certifications}
+                  onChange={(e) => setCertifications(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-500 text-white placeholder-gray-500 resize-none"
+                  placeholder="자격증을 쉼표로 구분하여 입력...&#10;&#10;예: 정보처리기사, AWS Solutions Architect, TOEIC 900점"
+                />
               </div>
             </div>
           </div>

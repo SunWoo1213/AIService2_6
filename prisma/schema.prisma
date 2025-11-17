@@ -1,0 +1,142 @@
+// AI Interview Service - Prisma Schema
+// PostgreSQL 데이터베이스 스키마 정의
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+// Users 테이블
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique @db.VarChar(255)
+  password_hash String    @db.VarChar(255)
+  name          String?   @db.VarChar(100)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  profile          UserProfile?
+  jobPostings      JobPosting[]
+  coverLetters     CoverLetter[]
+  interviewSessions InterviewSession[]
+
+  @@map("users")
+}
+
+// User Profiles 테이블
+model UserProfile {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique @map("user_id")
+  age              Int?
+  gender           String?  @db.VarChar(20)
+  careerJson       Json     @default("[]") @map("career_json") @db.JsonB
+  educationJson    Json     @default("[]") @map("education_json") @db.JsonB
+  certificatesJson Json     @default("[]") @map("certificates_json") @db.JsonB
+  skillsJson       Json     @default("[]") @map("skills_json") @db.JsonB
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// Job Postings 테이블
+model JobPosting {
+  id             Int       @id @default(autoincrement())
+  userId         Int       @map("user_id")
+  title          String?   @db.VarChar(500)
+  companyName    String?   @map("company_name") @db.VarChar(200)
+  originalS3Url  String?   @map("original_s3_url") @db.Text
+  extractedText  String?   @map("extracted_text") @db.Text
+  analysisJson   Json?     @map("analysis_json") @db.JsonB
+  status         String    @default("pending") @db.VarChar(50)
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coverLetters     CoverLetter[]
+  interviewSessions InterviewSession[]
+
+  @@map("job_postings")
+}
+
+// Cover Letters 테이블
+model CoverLetter {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @map("user_id")
+  jobPostingId  Int?     @map("job_posting_id")
+  contentText   String   @map("content_text") @db.Text
+  version       Int      @default(1)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  user             User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobPosting       JobPosting?             @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  feedbacks        CoverLetterFeedback[]
+  interviewSessions InterviewSession[]
+
+  @@map("cover_letters")
+}
+
+// Cover Letter Feedbacks 테이블
+model CoverLetterFeedback {
+  id             Int      @id @default(autoincrement())
+  coverLetterId  Int      @map("cover_letter_id")
+  feedbackText   String   @map("feedback_text") @db.Text
+  feedbackJson   Json?    @map("feedback_json") @db.JsonB
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  // Relations
+  coverLetter CoverLetter @relation(fields: [coverLetterId], references: [id], onDelete: Cascade)
+
+  @@map("cover_letter_feedbacks")
+}
+
+// Interview Sessions 테이블
+model InterviewSession {
+  id                Int       @id @default(autoincrement())
+  userId            Int       @map("user_id")
+  coverLetterId     Int?      @map("cover_letter_id")
+  jobPostingId      Int?      @map("job_posting_id")
+  status            String    @default("pending") @db.VarChar(50)
+  totalQuestions    Int       @default(5) @map("total_questions")
+  finalFeedbackJson Json?     @map("final_feedback_json") @db.JsonB
+  startedAt         DateTime? @map("started_at")
+  completedAt       DateTime? @map("completed_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coverLetter  CoverLetter?     @relation(fields: [coverLetterId], references: [id], onDelete: SetNull)
+  jobPosting   JobPosting?      @relation(fields: [jobPostingId], references: [id], onDelete: SetNull)
+  turns        InterviewTurn[]
+
+  @@map("interview_sessions")
+}
+
+// Interview Turns 테이블
+model InterviewTurn {
+  id                     Int      @id @default(autoincrement())
+  sessionId              Int      @map("session_id")
+  turnNumber             Int      @map("turn_number")
+  questionText           String   @map("question_text") @db.Text
+  questionAudioS3Url     String?  @map("question_audio_s3_url") @db.Text
+  userAnswerText         String?  @map("user_answer_text") @db.Text
+  userAnswerAudioS3Url   String?  @map("user_answer_audio_s3_url") @db.Text
+  createdAt              DateTime @default(now()) @map("created_at")
+
+  // Relations
+  session InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("interview_turns")
+}

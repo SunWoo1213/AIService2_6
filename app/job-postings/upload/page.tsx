@@ -7,9 +7,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import JobPostingAnalysis from '@/components/JobPostingAnalysis';
-import AuthGuard from '@/components/AuthGuard';
 
-function UploadJobPostingPageContent() {
+export default function UploadJobPostingPage() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -179,14 +178,6 @@ function UploadJobPostingPageContent() {
         )}
       </div>
     </div>
-  );
-}
-
-export default function UploadJobPostingPage() {
-  return (
-    <AuthGuard>
-      <UploadJobPostingPageContent />
-    </AuthGuard>
   );
 }
 

@@ -5,10 +5,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import AuthGuard from '@/components/AuthGuard';
 import { apiClient } from '@/lib/api-client';
 
-function ProfilePageContent() {
+export default function ProfilePage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -168,14 +167,6 @@ function ProfilePageContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-export default function ProfilePage() {
-  return (
-    <AuthGuard>
-      <ProfilePageContent />
-    </AuthGuard>
   );
 }
 

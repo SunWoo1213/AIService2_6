@@ -3,7 +3,7 @@
  */
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import InterviewResultPage from '@/components/InterviewResultPage';
@@ -17,11 +17,7 @@ export default function InterviewResultDetailPage() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadResult();
-  }, [sessionId]);
-
-  const loadResult = async () => {
+  const loadResult = useCallback(async () => {
     try {
       const result = await apiClient.getInterviewResult(parseInt(sessionId));
       setData(result);
@@ -31,7 +27,11 @@ export default function InterviewResultDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [sessionId]);
+
+  useEffect(() => {
+    loadResult();
+  }, [loadResult]);
 
   if (isLoading) {
     return (

@@ -34,5 +34,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   return res.status(200).json({ coverLetter: result.rows[0] });
 }
 
-export default withErrorHandler(withAuth(handler));
+const getCoverLetterHandler = withErrorHandler(withAuth(handler));
+
+export default getCoverLetterHandler;
 

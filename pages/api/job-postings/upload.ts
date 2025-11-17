@@ -65,5 +65,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   });
 }
 
-export default withErrorHandler(withAuth(handler));
+const uploadJobPostingHandler = withErrorHandler(withAuth(handler));
+
+export default uploadJobPostingHandler;
 

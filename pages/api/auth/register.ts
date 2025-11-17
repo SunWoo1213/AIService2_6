@@ -60,5 +60,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-export default withErrorHandler(handler);
+const registerHandler = withErrorHandler(handler);
+
+export default registerHandler;
 

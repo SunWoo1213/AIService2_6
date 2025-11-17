@@ -68,5 +68,7 @@ export async function transaction<T>(
   }
 }
 
-export default { query, getPool, getClient, transaction };
+const dbService = { query, getPool, getClient, transaction };
+
+export default dbService;
 

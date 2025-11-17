@@ -328,7 +328,7 @@ export async function speechToText(audioBuffer: Buffer, filename: string = 'audi
   }
 }
 
-export default {
+const openaiService = {
   analyzeJobPosting,
   generateCoverLetterFeedback,
   generateInterviewQuestion,
@@ -336,4 +336,6 @@ export default {
   textToSpeech,
   speechToText,
 };
+
+export default openaiService;
 

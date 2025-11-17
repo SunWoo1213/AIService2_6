@@ -55,5 +55,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   });
 }
 
-export default withErrorHandler(withAuth(handler));
+const getInterviewResultHandler = withErrorHandler(withAuth(handler));
+
+export default getInterviewResultHandler;
 

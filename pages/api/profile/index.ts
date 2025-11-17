@@ -56,5 +56,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   return res.status(405).json({ error: 'Method not allowed' });
 }
 
-export default withErrorHandler(withAuth(handler));
+const profileHandler = withErrorHandler(withAuth(handler));
+
+export default profileHandler;
 

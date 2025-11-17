@@ -11,7 +11,7 @@ import InterviewResultPage from '@/components/InterviewResultPage';
 export default function InterviewResultDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const sessionId = params?.id as string;
+  const sessionId = params?.id ? String(params.id) : '';
 
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<any>(null);

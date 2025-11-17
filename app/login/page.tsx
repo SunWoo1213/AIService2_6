@@ -4,12 +4,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -23,12 +23,9 @@ export default function LoginPage() {
     try {
       const result = await apiClient.login({ email, password });
       
-      // 토큰 저장
-      localStorage.setItem('token', result.token);
-      localStorage.setItem('user', JSON.stringify(result.user));
-
-      alert('로그인 성공!');
-      router.push('/');
+      // AuthContext의 login 함수를 호출
+      // 자동으로 토큰 저장, 상태 업데이트, 리다이렉트 처리
+      login(result.token, result.user);
     } catch (err: any) {
       setError(err.message || '로그인에 실패했습니다.');
       console.error('로그인 에러:', err);

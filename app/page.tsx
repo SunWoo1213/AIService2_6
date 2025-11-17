@@ -1,22 +1,43 @@
 /**
- * 홈 페이지
+ * 홈 페이지 (로그인 필요)
  */
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import Header from '@/components/Header';
 
 export default function HomePage() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-primary-500 mb-4" />
+          <p className="text-gray-400">로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
+      <Header />
       <div className="max-w-7xl mx-auto px-8 py-16">
         <div className="text-center mb-16">
           <h1 className="text-6xl font-bold mb-4">
             AI 취업 준비 서비스
           </h1>
-          <p className="text-xl text-gray-400">
+          <p className="text-xl text-gray-400 mb-4">
             자기소개서 피드백부터 실전 모의면접까지, AI가 함께합니다
           </p>
+          {user && (
+            <p className="text-lg text-primary-400">
+              환영합니다, <span className="font-semibold">{user.name || user.email}</span>님!
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">

@@ -17,7 +17,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   // 인증이 필요 없는 공개 라우트 목록
   const publicRoutes = [
-    '/',           // 홈페이지
     '/login',      // 로그인
     '/register',   // 회원가입
   ];

@@ -34,6 +34,9 @@ model UserProfile {
   userId           Int      @unique @map("user_id")
   age              Int?
   gender           String?  @db.VarChar(20)
+  currentJob       String?  @map("current_job") @db.VarChar(200)
+  careerSummary    String?  @map("career_summary") @db.Text
+  certifications   String?  @db.Text
   careerJson       Json     @default("[]") @map("career_json") @db.JsonB
   educationJson    Json     @default("[]") @map("education_json") @db.JsonB
   certificatesJson Json     @default("[]") @map("certificates_json") @db.JsonB

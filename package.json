@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node scripts/migrate.js",
+    "db:migrate:profile": "node scripts/run-migration.js",
+    "db:verify": "node scripts/verify-migration.js",
     "db:init": "node scripts/init-db.js"
   },
   "dependencies": {

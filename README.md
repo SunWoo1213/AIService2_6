@@ -126,8 +126,17 @@ npm install
 ### 3. 데이터베이스 마이그레이션
 
 ```bash
+# 전체 스키마 생성 (처음 설치 시)
 npm run db:migrate
+
+# 프로필 필드 추가 마이그레이션 (user_profiles 테이블 업데이트)
+npm run db:migrate:profile
+
+# 마이그레이션 검증
+npm run db:verify
 ```
+
+> 💡 **마이그레이션 가이드**: 자세한 내용은 [마이그레이션 빠른 시작 가이드](./docs/MIGRATION_QUICKSTART.md) 참고
 
 ### 4. 개발 서버 실행
 
@@ -219,6 +228,30 @@ vercel --prod
 ### 3. 확장성
 - RESTful API 설계로 네이티브 앱 확장 가능
 - JWT 토큰 기반 인증
+
+## 문서
+
+### 📖 주요 문서
+- [API 문서](./API.md) - 전체 API 엔드포인트 상세 설명
+- [배포 가이드](./DEPLOYMENT.md) - Vercel 배포 상세 가이드
+- [기여 가이드](./CONTRIBUTING.md) - 프로젝트 기여 방법
+
+### 🔧 마이그레이션 가이드
+- [빠른 시작](./docs/MIGRATION_QUICKSTART.md) - 5분 안에 마이그레이션 완료
+- [상세 가이드](./docs/MIGRATION_GUIDELINE.md) - 단계별 상세 설명 및 트러블슈팅
+- [마이그레이션 개요](./MIGRATION_GUIDE.md) - 마이그레이션 배경 및 개요
+
+### 🛠️ 트러블슈팅
+
+**"column p.current_job does not exist" 에러가 발생하나요?**
+```bash
+# 프로필 필드 마이그레이션 실행
+npm run db:migrate:profile
+
+# 검증
+npm run db:verify
+```
+자세한 내용은 [마이그레이션 빠른 시작 가이드](./docs/MIGRATION_QUICKSTART.md)를 참고하세요.
 
 ## 라이선스
 

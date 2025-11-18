@@ -9,3 +9,4 @@ ADD COLUMN IF NOT EXISTS certifications TEXT;
 -- 인덱스 추가 (검색 최적화)
 CREATE INDEX IF NOT EXISTS idx_user_profiles_current_job ON user_profiles(current_job);
 
+

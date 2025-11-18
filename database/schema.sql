@@ -17,6 +17,10 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     age INTEGER,
     gender VARCHAR(20),
+    -- 간단한 텍스트 필드로 프로필 입력을 더 쉽게 만듭니다
+    current_job VARCHAR(200),
+    career_summary TEXT,
+    certifications TEXT,
     -- JSONB 형태로 경력, 학력, 자격증 저장
     career_json JSONB DEFAULT '[]'::jsonb,
     -- 예: [{"company": "삼성전자", "position": "소프트웨어 엔지니어", "period": "2020-2023"}]
@@ -112,6 +116,7 @@ CREATE TABLE IF NOT EXISTS interview_turns (
 
 -- 인덱스 생성
 CREATE INDEX idx_user_profiles_user_id ON user_profiles(user_id);
+CREATE INDEX idx_user_profiles_current_job ON user_profiles(current_job);
 CREATE INDEX idx_job_postings_user_id ON job_postings(user_id);
 CREATE INDEX idx_cover_letters_user_id ON cover_letters(user_id);
 CREATE INDEX idx_cover_letters_job_posting_id ON cover_letters(job_posting_id);

@@ -75,3 +75,4 @@ async function initDatabase() {
 // 스크립트 실행
 initDatabase();
 
+

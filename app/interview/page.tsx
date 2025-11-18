@@ -3,22 +3,54 @@
  */
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import InterviewPage from '@/components/InterviewPage';
 import { apiClient } from '@/lib/api-client';
+
+interface CoverLetter {
+  id: number;
+  contentText: string;
+  contentPreview: string;
+  createdAt: string;
+  updatedAt: string;
+  jobPosting: {
+    id: number;
+    title: string;
+    companyName: string;
+  } | null;
+}
 
 export default function InterviewStartPage() {
   const router = useRouter();
   const [isStarted, setIsStarted] = useState(false);
   const [sessionData, setSessionData] = useState<any>(null);
-  const [coverLetterId, setCoverLetterId] = useState('');
+  const [coverLetterId, setCoverLetterId] = useState<number | null>(null);
+  const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
+  const [isLoadingList, setIsLoadingList] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // 자기소개서 목록 로드
+  useEffect(() => {
+    const loadCoverLetters = async () => {
+      try {
+        const result = await apiClient.listCoverLetters();
+        setCoverLetters(result.coverLetters);
+      } catch (err: any) {
+        console.error('자기소개서 목록 로드 실패:', err);
+        setError('자기소개서 목록을 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoadingList(false);
+      }
+    };
+
+    loadCoverLetters();
+  }, []);
+
   const handleStart = async () => {
     if (!coverLetterId) {
-      setError('자기소개서 ID를 입력해주세요.');
+      setError('자기소개서를 선택해주세요.');
       return;
     }
 
@@ -26,7 +58,7 @@ export default function InterviewStartPage() {
     setError('');
 
     try {
-      const result = await apiClient.startInterview(parseInt(coverLetterId));
+      const result = await apiClient.startInterview(coverLetterId);
       setSessionData(result);
       setIsStarted(true);
     } catch (err: any) {
@@ -82,25 +114,75 @@ export default function InterviewStartPage() {
           )}
 
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">
-              자기소개서 ID
+            <label className="block text-sm font-medium mb-3">
+              자기소개서 선택
             </label>
-            <input
-              type="number"
-              value={coverLetterId}
-              onChange={(e) => setCoverLetterId(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-500 transition-colors"
-              placeholder="예: 1"
-              required
-            />
-            <p className="mt-2 text-sm text-gray-400">
-              작성한 자기소개서의 ID를 입력하세요
-            </p>
+
+            {isLoadingList ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+                <span className="ml-3 text-gray-400">자기소개서 목록 불러오는 중...</span>
+              </div>
+            ) : coverLetters.length === 0 ? (
+              <div className="p-6 bg-gray-800 rounded-lg border border-gray-700 text-center">
+                <p className="text-gray-400 mb-4">작성된 자기소개서가 없습니다.</p>
+                <button
+                  onClick={() => router.push('/cover-letters/create')}
+                  className="px-4 py-2 bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors text-sm"
+                >
+                  자기소개서 작성하러 가기
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                {coverLetters.map((letter) => (
+                  <div
+                    key={letter.id}
+                    onClick={() => setCoverLetterId(letter.id)}
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                      coverLetterId === letter.id
+                        ? 'border-primary-500 bg-primary-900/20'
+                        : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        {letter.jobPosting ? (
+                          <div className="mb-2">
+                            <h3 className="font-semibold text-white">
+                              {letter.jobPosting.companyName} - {letter.jobPosting.title}
+                            </h3>
+                          </div>
+                        ) : (
+                          <h3 className="font-semibold text-white mb-2">자기소개서</h3>
+                        )}
+                        <p className="text-sm text-gray-400 line-clamp-2">
+                          {letter.contentPreview}
+                        </p>
+                      </div>
+                      <div className="ml-4 flex-shrink-0">
+                        {coverLetterId === letter.id && (
+                          <div className="w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                      <span>ID: {letter.id}</span>
+                      <span>작성일: {new Date(letter.createdAt).toLocaleDateString('ko-KR')}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <button
             onClick={handleStart}
-            disabled={isLoading || !coverLetterId}
+            disabled={isLoading || !coverLetterId || isLoadingList}
             className="w-full px-6 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg transition-colors font-semibold"
           >
             {isLoading ? '면접 준비 중...' : '면접 시작'}

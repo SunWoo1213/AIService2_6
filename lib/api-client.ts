@@ -115,6 +115,24 @@ export class ApiClient {
     return this.request<{ coverLetter: any }>(`/api/cover-letters/${id}`);
   }
 
+  async listCoverLetters() {
+    return this.request<{ 
+      coverLetters: Array<{
+        id: number;
+        contentText: string;
+        contentPreview: string;
+        createdAt: string;
+        updatedAt: string;
+        jobPosting: {
+          id: number;
+          title: string;
+          companyName: string;
+        } | null;
+      }>;
+      total: number;
+    }>('/api/cover-letters/list');
+  }
+
   // Interview
   async startInterview(coverLetterId: number) {
     return this.request<{

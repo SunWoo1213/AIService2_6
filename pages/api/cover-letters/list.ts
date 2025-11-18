@@ -6,9 +6,10 @@ import { NextApiResponse } from 'next';
 import { query } from '@/lib/db';
 import { withAuth, withErrorHandler, AuthenticatedRequest } from '@/lib/middleware';
 
-async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
+async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise<void> {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   const userId = req.user!.userId;
@@ -44,13 +45,11 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
     } : null,
   }));
 
-  return res.status(200).json({
+  res.status(200).json({
     coverLetters,
     total: coverLetters.length,
   });
 }
 
-const listCoverLettersHandler = withErrorHandler(withAuth(handler));
-
-export default listCoverLettersHandler;
+export default withErrorHandler(withAuth(handler));
 

@@ -7,16 +7,18 @@ import { query } from '@/lib/db';
 import { generateCoverLetterFeedback } from '@/lib/openai';
 import { withAuth, withErrorHandler, AuthenticatedRequest } from '@/lib/middleware';
 
-async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
+async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise<void> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   const userId = req.user!.userId;
   const { jobPostingId, contentText } = req.body;
 
   if (!jobPostingId || !contentText) {
-    return res.status(400).json({ error: 'jobPostingId와 contentText가 필요합니다.' });
+    res.status(400).json({ error: 'jobPostingId와 contentText가 필요합니다.' });
+    return;
   }
 
   // 자소서 저장
@@ -46,7 +48,8 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   );
 
   if (postingResult.rows.length === 0) {
-    return res.status(404).json({ error: '공고를 찾을 수 없습니다.' });
+    res.status(404).json({ error: '공고를 찾을 수 없습니다.' });
+    return;
   }
 
   const jobPosting = postingResult.rows[0];
@@ -70,14 +73,12 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
     ]
   );
 
-  return res.status(201).json({
+  res.status(201).json({
     message: '자기소개서 피드백이 생성되었습니다.',
     coverLetterId,
     feedback,
   });
 }
 
-const createCoverLetterHandler = withErrorHandler(withAuth(handler));
-
-export default createCoverLetterHandler;
+export default withErrorHandler(withAuth(handler));
 

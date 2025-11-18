@@ -7,7 +7,7 @@ import { NextApiResponse } from 'next';
 import { query } from '@/lib/db';
 import { withAuth, withErrorHandler, AuthenticatedRequest } from '@/lib/middleware';
 
-async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
+async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise<void> {
   const userId = req.user!.userId;
 
   if (req.method === 'GET') {
@@ -24,10 +24,12 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+      res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+      return;
     }
 
-    return res.status(200).json({ profile: result.rows[0] });
+    res.status(200).json({ profile: result.rows[0] });
+    return;
   }
 
   if (req.method === 'PUT') {
@@ -67,13 +69,12 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
       ]
     );
 
-    return res.status(200).json({ message: '프로필이 저장되었습니다.' });
+    res.status(200).json({ message: '프로필이 저장되었습니다.' });
+    return;
   }
 
-  return res.status(405).json({ error: 'Method not allowed' });
+  res.status(405).json({ error: 'Method not allowed' });
 }
 
-const profileHandler = withErrorHandler(withAuth(handler));
-
-export default profileHandler;
+export default withErrorHandler(withAuth(handler));
 

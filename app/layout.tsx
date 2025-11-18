@@ -6,6 +6,9 @@ import AuthProviderComponent from '@/components/AuthProvider'
 export const metadata: Metadata = {
   title: 'AI 취업 준비 서비스',
   description: 'AI 기반 자기소개서 피드백 및 모의 면접 서비스',
+  icons: {
+    icon: '/icon',
+  },
 }
 
 export default function RootLayout({

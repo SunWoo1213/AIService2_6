@@ -1,5 +1,5 @@
 /**
- * API 미들웨어 (인증, 에러 핸들링)
+ * API 미들웨어 (인증, 에러 핸들링, CORS)
  */
 import { NextApiRequest, NextApiResponse } from 'next';
 import { verifyToken, extractTokenFromHeader, JWTPayload } from './auth';
@@ -9,12 +9,52 @@ export interface AuthenticatedRequest extends NextApiRequest {
 }
 
 /**
- * 인증 미들웨어
+ * CORS 미들웨어
+ */
+export function withCors(
+  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void>
+) {
+  return async (req: NextApiRequest, res: NextApiResponse) => {
+    // CORS 헤더 설정
+    const origin = req.headers.origin || '*';
+    
+    // Vercel 도메인 또는 로컬호스트만 허용
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://ai-service2-6.vercel.app',
+      /https:\/\/ai-service2-6-.*\.vercel\.app$/, // Vercel preview 배포
+    ];
+
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (typeof allowed === 'string') {
+        return origin === allowed;
+      }
+      return allowed.test(origin);
+    });
+
+    if (isAllowed || process.env.NODE_ENV === 'development') {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+
+    // Preflight 요청 처리
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+
+    await handler(req, res);
+  };
+}
+
+/**
+ * 인증 미들웨어 (CORS 포함)
  */
 export function withAuth(
   handler: (req: AuthenticatedRequest, res: NextApiResponse) => Promise<void>
 ) {
-  return async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  return withCors(async (req: AuthenticatedRequest, res: NextApiResponse) => {
     try {
       const token = extractTokenFromHeader(req.headers.authorization);
 
@@ -30,16 +70,16 @@ export function withAuth(
       console.error('인증 에러:', error);
       return res.status(401).json({ error: '유효하지 않은 토큰입니다.' });
     }
-  };
+  });
 }
 
 /**
- * 에러 핸들러 래퍼
+ * 에러 핸들러 래퍼 (CORS 포함)
  */
 export function withErrorHandler(
   handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void>
 ) {
-  return async (req: NextApiRequest, res: NextApiResponse) => {
+  return withCors(async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       await handler(req, res);
     } catch (error: any) {
@@ -50,7 +90,7 @@ export function withErrorHandler(
       
       return res.status(statusCode).json({ error: message });
     }
-  };
+  });
 }
 
 /**

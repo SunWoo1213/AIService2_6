@@ -5,15 +5,17 @@ import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Readable } from 'stream';
 
+// S3 버킷 리전 (에러 메시지에서 확인: eu-west-2)
+const BUCKET_REGION = process.env.AWS_REGION || 'eu-west-2';
+const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'ai-interview-bucket';
+
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION || 'ap-northeast-2',
+  region: BUCKET_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
   },
 });
-
-const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'ai-interview-bucket';
 
 export interface UploadOptions {
   folder: string; // 'job-postings', 'interview-questions', 'user-answers'
@@ -38,7 +40,8 @@ export async function uploadToS3(options: UploadOptions): Promise<string> {
 
   try {
     await s3Client.send(command);
-    return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    // 리전별 올바른 URL 형식 사용
+    return `https://${BUCKET_NAME}.s3.${BUCKET_REGION}.amazonaws.com/${key}`;
   } catch (error) {
     console.error('S3 업로드 에러:', error);
     throw new Error('파일 업로드에 실패했습니다.');
@@ -87,7 +90,7 @@ export async function getPresignedUploadUrl(
   });
 
   const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-  const fileUrl = `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+  const fileUrl = `https://${BUCKET_NAME}.s3.${BUCKET_REGION}.amazonaws.com/${key}`;
 
   return { uploadUrl, fileUrl };
 }

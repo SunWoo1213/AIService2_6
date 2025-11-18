@@ -102,7 +102,7 @@ AI_Service2_3/
 DATABASE_URL=postgresql://username:password@localhost:5432/ai_interview_db
 
 # AWS S3
-AWS_REGION=ap-northeast-2
+AWS_REGION=eu-west-2
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
 S3_BUCKET_NAME=ai-interview-bucket

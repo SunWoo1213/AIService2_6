@@ -12,7 +12,7 @@ export interface AuthenticatedRequest extends NextApiRequest {
  * CORS 미들웨어
  */
 export function withCors(
-  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void>
+  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void | any>
 ) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     // CORS 헤더 설정
@@ -52,7 +52,7 @@ export function withCors(
  * 인증 미들웨어 (CORS 포함)
  */
 export function withAuth(
-  handler: (req: AuthenticatedRequest, res: NextApiResponse) => Promise<void>
+  handler: (req: AuthenticatedRequest, res: NextApiResponse) => Promise<void | any>
 ) {
   return withCors(async (req: AuthenticatedRequest, res: NextApiResponse) => {
     try {
@@ -77,7 +77,7 @@ export function withAuth(
  * 에러 핸들러 래퍼 (CORS 포함)
  */
 export function withErrorHandler(
-  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void>
+  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void | any>
 ) {
   return withCors(async (req: NextApiRequest, res: NextApiResponse) => {
     try {

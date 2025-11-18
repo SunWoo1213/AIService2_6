@@ -6,9 +6,10 @@ import { NextApiResponse } from 'next';
 import { query } from '@/lib/db';
 import { withAuth, withErrorHandler, AuthenticatedRequest } from '@/lib/middleware';
 
-async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
+async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise<void> {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   const userId = req.user!.userId;
@@ -28,10 +29,11 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   );
 
   if (result.rows.length === 0) {
-    return res.status(404).json({ error: '자기소개서를 찾을 수 없습니다.' });
+    res.status(404).json({ error: '자기소개서를 찾을 수 없습니다.' });
+    return;
   }
 
-  return res.status(200).json({ coverLetter: result.rows[0] });
+  res.status(200).json({ coverLetter: result.rows[0] });
 }
 
 const getCoverLetterHandler = withErrorHandler(withAuth(handler));

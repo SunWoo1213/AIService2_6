@@ -83,6 +83,16 @@ export class ApiClient {
     );
   }
 
+  async submitJobPostingText(text: string) {
+    return this.request<{ jobPostingId: number; extractedText: string }>(
+      '/api/job-postings/submit-text',
+      {
+        method: 'POST',
+        body: JSON.stringify({ text }),
+      }
+    );
+  }
+
   async analyzeJobPosting(jobPostingId: number) {
     return this.request<{ analysis: any }>('/api/job-postings/analyze', {
       method: 'POST',
